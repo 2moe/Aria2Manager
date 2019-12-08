@@ -151,6 +151,10 @@ AriaNG(index.html)¡ª¡ª¡ª-It fork from https://github.com/mayswind/AriaNg/release
 
 AriaNG-Native¡ª¡ª¡ª-It fork from https://github.com/mayswind/AriaNg-Native
 
+Aria2 bt-tracker updater¡ª¡ª¡ªIt comes from  https://www.feng.ee/aria2-trackers-auto-update.html
+
+putty ¡ª¨CIt comes from https://www.putty.org/
+
 
 
 
