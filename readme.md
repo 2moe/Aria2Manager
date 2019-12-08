@@ -126,13 +126,16 @@ If you are still using a 32-bit device, you can switch to the 32-bit version by 
 ### 解除限制编译(特别优化)版安装说明：
 
 Step1.解压后打开“aria2”文件夹。
+
 Step2.win10用户点击“win8-win10一键安装.exe”,win7用户点击“win7一键安装”。
+
 ps：默认为64位版，32位用户请在安装完成后，点击“切换到32位.exe”。
 如需体验完整功能，请点击“她明明超厉害，却过分低调.exe”。
 
 ### 原版（轻微优化）安装说明：
 
 Step1.解压后打开“Aria2-Original_edition”
+
 Step2.直接运行“一键生成快捷方式并启动.exe”，并允许防火墙通过。
 如需体验完整功能，请点击“这个管理器不怎么厉害.exe”。
 
