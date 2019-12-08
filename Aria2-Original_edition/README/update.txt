@@ -1,0 +1,2 @@
+Aria2£ºhttps://github.com/aria2/aria2/releases
+AriaNg£ºhttps://github.com/mayswind/AriaNg/releases
