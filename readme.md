@@ -1,14 +1,16 @@
 ## ***Only for windows!***
 
-https://github.com/2moe/Aria2Manager/tree/1.34-old-version
+https://github.com/2moe/Aria2Manager
+
+这是一个旧版的readme,新版还未完成编辑。
+
+
 
 ## ***Features***
 
 It supports up to 999 download threads.
 
-![img](https://i.loli.net/2019/09/17/2rd4C3cVa97KDTo.png)
-
-
+![[https://github.com/2moe/Aria2Manager/raw/master/aria2/%E6%89%B9%E6%B3%A8%202019-12-10%20101114.png](https://github.com/2moe/Aria2Manager/raw/master/aria2/%E6%89%B9%E6%B3%A8%202019-12-10%20101114.png)
 
 Here are the features supported by the original aria2:
 
