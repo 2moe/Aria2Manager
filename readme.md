@@ -10,7 +10,7 @@ https://github.com/2moe/Aria2Manager
 
 It supports up to 999 download threads.
 
-![[https://github.com/2moe/Aria2Manager/raw/master/aria2/%E6%89%B9%E6%B3%A8%202019-12-10%20101114.png](https://github.com/2moe/Aria2Manager/raw/master/aria2/%E6%89%B9%E6%B3%A8%202019-12-10%20101114.png)
+![批注 2019-12-10 102344.png](https://i.loli.net/2019/12/10/SFCg3h5DXaGWlQR.png)](https://github.com/2moe/Aria2Manager/raw/master/aria2/%E6%89%B9%E6%B3%A8%202019-12-10%20101114.png)
 
 Here are the features supported by the original aria2:
 
@@ -61,7 +61,7 @@ Here are the features supported by the original aria2:
 
 ## ***Installation***
 
-![img](https://i.loli.net/2019/09/17/5aPCU7SxmNiqwOu.png)
+![批注 2019-12-10 101114.png](https://i.loli.net/2019/12/10/b8uFJDmqg6QfySn.png)
 
 Open the '她明明超厉害，却过分低调.exe', then enter the number 0,and finally press enter.
 
