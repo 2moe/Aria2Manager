@@ -1,1 +1,0 @@
-start PowerShell -Command ".\README\Program\bat\onekey.bat"
