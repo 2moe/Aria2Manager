@@ -1,7 +1,7 @@
 @echo off
-%1(start /max cmd.exe /c %0 :&exit)
+%1(start /max powershell.exe /c %0 :&exit)
 COLOR 70
-title  Aria2 Moe Manager
+title  Congratulations!
 echo;                                                                                                    
 echo;                                                                                                    
 echo;                                                                          ::rXi                     
@@ -65,4 +65,12 @@ echo;        0X     ;MM0BBWW@M0.:B0ZB088r7XSi.:,:,:,,,:,:,,:i,,::,,,:,. 7W88M   
 echo;         0X.     WMW00000WWi2MZaZB2rXXS:.,,,:,:::,:,:.;:,,:,:,::: :7BB@Z    .@0   .;BM00X           
 echo;          ;;      ;MMMMMMMMMMMMMMMS22aZ;,::i:::::i:i:;r::i:i:i:i,,7a0MM    ,SX     7X;.             
 echo;    
-ECHO.&ECHO. ※安装完成，按任意键退出！若桌面没有自动生成快捷方式，请进入当前目录下的README\Program\AriaNG，进行手动运行。※ &PAUSE >NUL 2>NUL&goto exit
+ECHO.&ECHO. ※安装完成，若验证失败，请检查密钥是否输入正确，密钥保存在aria2目录下的"secret-token(密钥).txt"。
+cd ..\..\..\
+echo.您当前的密钥是
+type .\"secret-token(密钥).txt"
+echo.本机hostname为localhost,默认端口为6800，protocal为websocket或http，请前往ariaNG settings修改rpc设定。
+echo.默认rpc地址为http://localhost:6800/jsonrpc
+powershell echo "http://token:$(type .\'secret-token(密钥).txt')@localhost:6800/jsonrpc" > .\rpc-address.txt
+powershell echo "部分第三方插件使用的rpc地址为$(type .\'rpc-address.txt')"
+echo.按任意键退出！※ &PAUSE >NUL 2>NUL&goto exit

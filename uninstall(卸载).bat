@@ -1,7 +1,7 @@
 @echo off 
 COLOR 70
 title aria2 uninstaller
-Taskkill /F /IM aria2c.exe
+Taskkill /F /IM aria2-trackers-update.exe
 echo;                                                                                                    
 echo;                                                                                                    
 echo;                                            ::ririrrrii::.                                          
@@ -62,14 +62,16 @@ echo;           iL1  b::iiii:uB:i7bEqu:rr:...    ....7: .. ...    :vrivg15j15 .5
 echo;           uYU  su.irii:sR   JQPir7r   ....... :r7 ... . . .  i7i:Sq5uQ.  5ii:E.  B7 .:::::d  Z.L.  
 echo;           5b5   Dri777rBP    QR7Y2:...........:Y5:.......... :JJ75BMB1   PJr1P  1B..irii:Zi  B:K   
 echo;           :ii   .i.....r:     i.::. ..... ... ..i.. ........  :...i:i    ::.r   s: .....:i   r.:  
+TaskList /FI "IMAGENAME eq aria2c.exe" /FO LIST
+Taskkill /F /IM aria2c.exe
 set current_dir="%~dp0"
 cd ..
 echo 停止服务完成，按任意键将删除当前目录所有文件。此操作一旦执行将无法撤销，请慎重考虑，关闭窗口则取消删除。
-echo.注:vc++2019不会自动卸载。
 pause > nul
 rmdir /Q /S %current_dir% & echo 所有文件都已删除，正在移除计划任务。
 echo.若移除失败，请以管理员身份运行或手动移除。
 schtasks /delete /TN Aria2-BT-trackers-update /F
 schtasks /delete /TN Aria2 /F
+echo.若提示文件被占用，请关闭浏览器中已打开的ariaNG页面。
 %windir%\system32\taskschd.msc /s
 ECHO.&ECHO. ※ 卸载完成，按任意键返回※ &PAUSE >NUL 2>NUL&goto menu
