@@ -5,7 +5,7 @@
 ::YAwzuBVtJxjWCl3EqQJgSA==
 ::ZR4luwNxJguZRRnk
 ::Yhs/ulQjdF+5
-::cxAkpRVqdFKZSjk=
+::cxAkpRVqdFKZSDk=
 ::cBs/ulQjdF+5
 ::ZR41oxFsdFKZSTk=
 ::eBoioBt6dFKZSDk=
@@ -14,8 +14,8 @@
 ::dAsiuh18IRvcCxnZtBJQ
 ::cRYluBh/LU+EWAnk
 ::YxY4rhs+aU+IeA==
-::cxY6rQJ7JhzQF1fEqQJhZkgBAlTRXA==
-::ZQ05rAF9IBncCkqN+0xwdVtCHUrRaSXqVdU=
+::cxY6rQJ7JhzQF1fEqQJhZkgBAlTWXA==
+::ZQ05rAF9IBncCkqN+0xwdVtCHUrRaSXqUtU=
 ::ZQ05rAF9IAHYFVzEqQIROhJVHkSvM276K7QS6e/+/Yo=
 ::eg0/rx1wNQPfEVWB+kM9LVsJDIFH5e1C6DPkBmAtCm9pS8jTh23jlAo2DjxRx2X7DME5mx79NRo=
 ::fBEirQZwNQPfEVWB+kM9LVsJDAmNOQs=
@@ -26,7 +26,7 @@
 ::ZQ0/vhVqMQ3MEVWAtB9wSA==
 ::Zg8zqx1/OA3MEVWAtB9wPBZbSUqPOQs=
 ::dhA7pRFwIByZRRmM4FYgO0EbAwOLKGOvBPsf5+W0veeIpwI8Rus+KqLa1LWJJfJc+EDocJc+02k6
-::Zh4grVQjdCuDJFiW/UNiFJ6RlYJ60u1C6D3KDW0VBm9JccLBuGfSrAcEPTFmxmTOBM00ltgozn86
+::Zh4grVQjdCuDJFiW/UNiFClxbSCvGVeKFLob+un2092OrB5PaGf6oQkjNDJ2zmjFD8AKnBPjBfWGdE7h2JOHmZdDiIvpR+aSVSqAL8L8
 ::YB416Ek+Zm8=
 ::
 ::
@@ -229,17 +229,42 @@ TaskList /FI "IMAGENAME eq aria2c.exe" /FO LIST
 echo.正在重启aria2c进程。
 Taskkill /F /IM aria2c.exe >nul 2>nul
 .\aria2c.exe --conf-path=aria2.conf
+echo.	
+findstr /i "#rpc-secret=" .\aria2.conf
+if ERRORLEVEL 1 (goto normal) else (goto disabled)
+
+::密钥被禁用
+:disabled
+echo.您当前没有启用密钥。
 echo.本机hostname为localhost,默认端口为6800，protocal为websocket或http，请前往ariaNG settings修改rpc设定。
+echo.默认rpc地址为http://localhost:6800/jsonrpc
+goto recovery
+
+:normal
 echo.若验证失败，请检查密钥是否输入正确，密钥保存在当前目录下的"secret-token(密钥).txt"。
 echo.
-echo.若要手动设定密钥，请打开aria2.conf，修改rpc-secret=这一行内容。
+echo.若要手动设定密钥，请打开aria2.conf，去掉rpc-secret=开头的'#'，并在'='后输入你想要的密码。
 echo.
-PowerShell -Command "Get-content  .\aria2.conf |findstr 'rpc-secret=' > 'secret-token(密钥).txt' "
+PowerShell -Command "Get-content  .\aria2.conf |findstr 'rpc-secret=' |out-file 'secret-token(密钥).txt' -encoding ascii"
+type .\"secret-token(密钥).txt"
+echo.
+start .\aria2.conf
+copy /y ".\secret-token(密钥).txt"  ".\README\Program\bin\rpc-secret.txt"  >nul 2>nul
+cd .\README\Program\bin
+.\sed.exe -i "s:^rpc-secret=::" .\rpc-secret.txt
+move /y ".\rpc-secret.txt" ..\..\..\"secret-token(密钥).txt"  >nul 2>nul
+cd ..\..\..\
+echo.若开头为"#rpc-secret",则表示禁用密钥。
+echo.您当前的密钥是
 type .\"secret-token(密钥).txt"
 echo.
 echo.本机hostname为localhost,默认端口为6800，protocal为websocket或http，请前往ariaNG settings修改rpc设定。
 echo.默认rpc地址为http://localhost:6800/jsonrpc
 echo.
+powershell echo "http://token:$(type .\'secret-token(密钥).txt')@localhost:6800/jsonrpc" > .\rpc-address.txt
+powershell echo "部分第三方插件使用的rpc地址为$(type .\'rpc-address.txt')"
+goto recovery
+:recovery
 echo.
 echo.若无法联网，则可能是您没有允许本应用通过windows defender防火墙。
 firewall.cpl 
@@ -266,6 +291,7 @@ cd ..\AriaNg\
 start "" ".\index.html"
 cd ..\..\..\
 del /f .\"secret-token(密钥).txt"
+del /f .\rpc-address.txt
 .\aria2c.exe --conf-path=aria2.conf 
 echo;                                                                                                    
 echo;                                                                                                    
@@ -357,6 +383,8 @@ cd .\README\Program\bt-trackers-update\
 start .\aria2-trackers-update.exe
 cd ..\bat
 start .\success.bat
+cd ..\bin
+start .\generate-rpc-addr.bat
 cd ..\..\..\
 echo;                                                                                                    
 echo;                                                                                                    
@@ -427,17 +455,16 @@ explorer shell:AppsFolder\c5e2524a-ea46-4f67-841f-6a9465d9d515_cw5n1h2txyewy!App
 ECHO.&ECHO ※按任意键返回。※ &PAUSE >NUL 2>NUL&goto menu
 
 :enable
-@echo off
 Taskkill /F /IM aria2c.exe
+echo.正在初始化。。。
 ::start "" ".\downloads"
-cd /d %~dp0
+::cd /d %~dp0
 cd .\README\Program\bin
 echo.即将调用openssl的随机函数生成一个24位字符的密钥。
-::echo  "请谨慎保管好您的密码!!!Please keep your password carefully!!!" > ..\..\..\password.txt
 .\openssl.exe rand -base64 24 > ..\..\..\"secret-token(密钥).txt"
 cd ..\..\..\
+echo set WshShell = CreateObject("wscript.Shell"):Set Lnk = WshShell.CreateShortcut(WshShell.SpecialFolders("Desktop") ^& "\Aria2.lnk"):Lnk.TarGetPath = ("%cd%\README\Program\bat\start.bat"):Lnk.IconLocation = ("%cd%\README\Program\AriaNg\ico.ico"):Lnk.Save >>CreateLnk.vbs && Cscript.exe CreateLnk.Vbs & del CreateLnk.Vbs
 copy /y ".\secret-token(密钥).txt"  ".\README\Program\bin\rpc-secret.txt"
-del /f "secret-token(密钥).txt"
 echo.Your secret-token(密钥) is
 type .\"secret-token(密钥).txt"
 cd .\README\Program\bin
@@ -445,8 +472,9 @@ cd .\README\Program\bin
 .\sed.exe -i "s/rpc-secret=/#rpc-secret=/g" ..\..\..\aria2.conf
 .\sed.exe -i "/rpc-secret=/d" ..\..\..\aria2.conf
 .\sed.exe -i "67 r./rpc-secret.txt" ..\..\..\aria2.conf
-del .\"rpc-secret.txt"
+del .\rpc-secret.txt
 cd ..\AriaNg\
+start "" "http://aria2.net"
 start "" ".\index.html"
 cd ..\..\..\
 .\aria2c.exe --conf-path=aria2.conf 
@@ -512,15 +540,18 @@ echo;          Mr     W7;;B7   W@a;77XXS7;:XSZ0BaXXXXXXSXSXXXSXSXZXSSaZ   ,WXiSX
 echo;          Mi     ;WrXB    iMr7X2X;:,., . i20ZZaZZZ2aaa22SX7raa2BS    7B;X2S::rSXZ8   .8Z            
 echo;          8@      i8MX    XZ7SXi,.,,:,:,:..,rrX777XXXXX7XXX7X0S,     0arB2;ra8ZZ7    BM.            
 echo;           8a:      2:   ;MSX;,,:iiiiiii:i::,,.,.,,,,:::,:S2S@      ;Ma@0SXSS7.     ;0  
+TaskList /FI "IMAGENAME eq aria2c.exe" /FO LIST
 echo.密钥保存在当前目录下的"secret-token(密钥).txt"
 echo.您当前的密钥是
 type .\"secret-token(密钥).txt"
+echo.
 echo.本机hostname为localhost,默认端口为6800，protocal为websocket或http，请前往ariaNG settings修改rpc设定。
 echo.默认rpc地址为http://localhost:6800/jsonrpc
-powershell echo "http://token:$(type .\'secret-token(密钥).txt')@localhost:6800/jsonrpc" > .\rpc-address.txt
-powershell echo "部分第三方插件使用的rpc地址为$(type .\'rpc-address.txt')"
+echo.
+echo.部分第三方插件使用的rpc地址为
+powershell echo "http://token:$(type .\'secret-token(密钥).txt')@localhost:6800/jsonrpc"
 start .\"secret-token(密钥).txt"
-ECHO.&ECHO ※ 密钥启用成功 ※ &PAUSE >NUL 2>NUL&goto menu
+ECHO.&ECHO ※ 密钥启用成功,按任意键返回。 ※ &PAUSE >NUL 2>NUL&goto menu
 
 :uninstall
 echo;                                                                                                    

@@ -74,4 +74,4 @@ schtasks /delete /TN Aria2-BT-trackers-update /F
 schtasks /delete /TN Aria2 /F
 echo.若提示文件被占用，请关闭浏览器中已打开的ariaNG页面。
 %windir%\system32\taskschd.msc /s
-ECHO.&ECHO. ※ 卸载完成，按任意键返回※ &PAUSE >NUL 2>NUL&goto menu
+ECHO.&ECHO. ※ 卸载完成，按任意键退出。※ &PAUSE >NUL 2>NUL&goto exit

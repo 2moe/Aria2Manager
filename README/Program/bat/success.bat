@@ -71,6 +71,8 @@ echo.您当前的密钥是
 type .\"secret-token(密钥).txt"
 echo.本机hostname为localhost,默认端口为6800，protocal为websocket或http，请前往ariaNG settings修改rpc设定。
 echo.默认rpc地址为http://localhost:6800/jsonrpc
-powershell echo "http://token:$(type .\'secret-token(密钥).txt')@localhost:6800/jsonrpc" > .\rpc-address.txt
-powershell echo "部分第三方插件使用的rpc地址为$(type .\'rpc-address.txt')"
-echo.按任意键退出！※ &PAUSE >NUL 2>NUL&goto exit
+echo.部分第三方插件使用的rpc地址为
+powershell echo "http://token:$(type .\'secret-token(密钥).txt')@localhost:6800/jsonrpc" 
+::> .\rpc-address.txt
+::powershell echo "部分第三方插件使用的rpc地址为$(type .\'rpc-address.txt')"
+echo.※按任意键退出。 &PAUSE >NUL 2>NUL&goto exit
