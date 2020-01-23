@@ -1,0 +1,1 @@
+echo "http://token:$(type .\rpc-secret.txt)@localhost:6800/jsonrpc"

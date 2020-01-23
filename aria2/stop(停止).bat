@@ -1,0 +1,1 @@
+start PowerShell -Command ".\data\Program\bat\stop.bat"
