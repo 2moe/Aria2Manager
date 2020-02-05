@@ -79,8 +79,8 @@ echo;      ║ [7] 手动更新bt-trackers                ║       rMM@ZMZaMBXa2aMa  
 echo;      ║ [8] 移除更新模块 Remove update-module  ║         BMMM@MMM22aSZMr        MWi    M:   r@MWr           
 echo;      ║════════════════════════════════════════║        ZM2ZMMMMMBS228MMS       M      .;aW80r              
 echo;      ║ d=====(￣▽￣*)Token Secret/Password   ║       ,MW2MMMMMBMSaS0MMMa      .;:7aB8MMZM,                
-echo;      ║ [10] Enable secret  启用密钥           ║        ;MMZ0MWB@Ma22X@MMMM8MM@MMWM2MM0Z  @MW,              
-echo;      ║ [11] Disable secret  禁用密钥          ║          7  BZ  MMM@ZZM8M0 XM  Ma0MM@i    MXM0             
+echo;      ║ [9] Enable secret  启用密钥            ║        ;MMZ0MWB@Ma22X@MMMM8MM@MMWM2MM0Z  @MW,              
+echo;      ║ [10] Disable secret  禁用密钥          ║          7  BZ  MMM@ZZM8M0 XM  Ma0MM@i    MXM0             
 echo;      ║════════════════════════════════════════║             rZMMMMMM  M  MS8BB 8M:  2M WM.           
 echo;　　　║oヾ(≧▽≦*)Modify the number of threads║                        M8MX Mi XM. M, 7M   M2 XWW          
 echo;　　　║ [16]  16线程（Strong compatibility）   ║                       Wa    MX XM aB8@rM,  ;M  8M,         
@@ -93,7 +93,7 @@ echo;      ║  其他选项 other options                ║                         
 echo;      ║ [11] 访问发布原帖                      ║                          2MB7Za0BMBB2S2MBM2aM7              
 echo;　　　║ [12] View IP address           　　　  ║                      :rXa@MMM8XMW8       0@7M               
 echo;　　　║ [13] 插件 plugin                       ║                 XBMMMMMMMMBXZM7M          MMM               
-echo;　　　║ [14] 临时兼容模式                      ║               ,M8@MMBX:      MMM          :MM               
+echo;　　　║ [14] 兼容模式                          ║               ,M8@MMBX:      MMM          :MM               
 echo;　　　 ════════════════════════════════════════                              ,MaZ;          XMa                         
 
 
@@ -135,7 +135,8 @@ if /i "%Memories%"=="aria2" Goto aria2c
 if /i "%Memories%"=="aria2c" Goto aria2c
 if /i "%Memories%"=="a2" Goto aria2c
 if /i "%Memories%"=="systemctl start aria2c" Goto aria2c
-
+if /i "%Memories%"=="r" Goto rssbot
+if /i "%Memories%"=="rss" Goto rssbot
 echo.&echo  → 该输入无效，请重新输入！This input is invalid, please re-enter!この入力は無効です。再入力してください！
 pause >nul
 goto menu
@@ -146,6 +147,33 @@ goto menu
 ::start PowerShell -Command "..\bat\alias.bat"
 ::powershell function aria2c{..\data\Program\original-edition\aria2c.exe} 
 cd /d %~dp0
+:tmp
+cd /d %~dp0
+if exist ".\data\Program\original-edition\aria2c.exe" (goto start-aria2-Compatibility-mode) else (goto check-compatibility-module)
+
+:check-compatibility-module
+cd /d %~dp0
+if exist ".\data\Program\compatibility-module.7z.exe" (goto un7z-compatibility-module) else (goto download-compatibility-module)
+:download-compatibility-module
+cd /d %~dp0
+cd .\data\Program\
+echo.未检测到兼容性模块，按任意键开始下载，否则请直接关闭窗口。
+pause
+.\bin\curl.exe -L -o compatibility-module.7z.exe "https://m.tmoe.me/down/share/windows/aria2/modules/compatibility-module.7z.exe"
+echo.Download completed and is activating for you.
+timeout /t 1
+goto un7z-compatibility-module
+
+:un7z-compatibility-module
+cd /d %~dp0
+cd .\data\Program\
+echo.检测到兼容性模块未启用，正在为您启用。
+.\compatibility-module.7z.exe -y  
+timeout /t 1 >nul 2>nul
+echo.正在清除已下载的缓存数据。
+del .\compatibility-module.7z.exe
+goto start-aria2-Compatibility-mode
+:start-aria2-Compatibility-mode
 echo.启动兼容模式将调用原版aria2,故无法突破线程数限制。
 echo.使用指南：输入aria2c url或aria2 url又或者是a url 再按回车即可下载
 echo.示例1:下载百度首页，输入aria2c "https://baidu.com"
@@ -155,6 +183,7 @@ echo.您即将进入兼容模式,将打开一个新窗口，请在该窗口下进行操作。
 echo.其它说明：若您已经启用更新模块，在该窗口下输sh或bash将会进入shell模式。
 echo.隐藏传送门：在主菜单下输aria2能跳过启动提示，直接进入兼容模式。
 timeout /t 1
+cd /d %~dp0
 start .\data\Program\bat\original-edition.bat
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto menu
 :aria2
@@ -165,7 +194,6 @@ goto menu
 :plugin
 cls
 cd /d %~dp0
-echo.非常抱歉，该功能目前仍在开发中，暂未开放。
 echo.
 echo;                                                                                                    
 echo;                                                                                                    
@@ -235,7 +263,7 @@ echo.[1] annie视频解析
 echo.[2] 删除annie
 echo.[3] aria2 rss订阅（telegram机器人waifud）
 echo.[4] 删除rss机器人waifud
-echo.[5] 更新已安装的插件
+echo.[5] 关于插件更新
 echo.[6] 移除[兼容模式]模块
 echo.[9] 删除所有插件
 echo.
@@ -243,12 +271,14 @@ set /p plugins=请输入选项数字并按回车键。Please enter the option number and pres
 if /i "%plugins%"=="0" Goto menu 
 if /i "%plugins%"=="1" Goto annie
 if /i "%plugins%"=="2" Goto delete-annie
-if /i "%plugins%"=="3" Goto rssbot
+if /i "%plugins%"=="3" Goto check-rssbot
 if /i "%plugins%"=="4" Goto delete-rssbot
-if /i "%plugins%"=="5" Goto update-plugins
-if /i "%plugins%"=="6" Goto Remove-compatible-module
+if /i "%plugins%"=="5" Goto update-plugins-faq
+if /i "%plugins%"=="6" Goto Remove-compatibility-mode-module
 if /i "%plugins%"=="9" Goto delete-all 
 if /i "%plugins%"=="a" Goto quick-start-annie
+if /i "%plugins%"=="r" Goto rssbot
+if /i "%plugins%"=="rss" Goto rssbot
 echo.&echo  → 该输入无效，请重新输入！This input is invalid, please re-enter!この入力は無効です。再入力してください！
 pause >nul
 goto plugin
@@ -262,7 +292,88 @@ goto menu
 :annie
 cd /d %~dp0
 echo.
-cls
+if exist ".\data\Program\plugins\annie\annie.exe" (goto start-annie) else (goto download-annie)
+:download-annie
+cd /d %~dp0
+cd .\data\Program\
+mkdir plugins >nul 2>nul
+cd plugins
+echo.未检测到annie，按任意键开始下载，否则请直接关闭窗口。
+pause
+::..\original-edition\aria2c.exe "https://m.tmoe.me/down/share/windows/aria2/plugins/annie.7z.exe"
+..\bin\curl.exe -L -o annie.7z.exe "https://m.tmoe.me/down/share/windows/aria2/plugins/annie.7z.exe"
+echo.Download completed and is activating for you.
+timeout /t 1
+.\annie.7z.exe -y  
+timeout /t 1 >nul 2>nul
+echo.正在清除已下载的缓存数据。
+del .\annie.7z.exe 
+echo.github原地址https://github.com/iawia002/annie
+echo.本插件已由Aria2MoeManager开发者做特别适配。
+goto start-annie
+:start-annie
+echo;                                              .,ii;;7r7;iii:,                                       
+echo;                                         :iXS222SSXXXXXXXXXSSaS2X;.                                 
+echo;                               .::iiiSZ20aSX7;;;;;r;r;r;r;r;r;;;XX2SXi                              
+echo;                ;MMMMMMMMMMMMMMMMMMMMMZS;iii::,:,:,:,i:;;i:;;;;;;;ii;77r                            
+echo;                :MMMM@M@M@M@MWWBW@0S;,:::,:,:,:::::,:::,iii.::iir;r7SS2Xa2:.,                       
+echo;                 MM@WWWWWWBWBBBMB7:,,i::,::::i,i:i::,i::,:ii,:,,:;;70MM@WMMMMMMMMMW8aSr;,.          
+echo;                 iM@WBWBWBBBBW@2:..:i:::::::i,i:::i:::i::::;i,:::,:i:X@B00BBWWMMMMMMMMMMMMMMMM@     
+echo;                  WMWWBWBWBB@W;. ,:i,i::,:;;,i:i::::::::::,;;,::::,,:,7WB08B0WBWW@WWW@WWW@@MMM2     
+echo;                  .MMWWWBBBM0, .:::::::::7;:i:i::,::i::::::iX,::i:::,::7W000BBBWWWWBWW@W@MMWMM      
+echo;                   8M@BWBWMZ ..::i,i::,,7X,:,::i:::::i:::i::Si,::::::,,:X@00BBBWBWBWW@@MM0XSM;      
+echo;                    MMWB@M2 .,,:;::::,,;Z:,:i:i:::::i:i::::.2;,:ii:::::.,Z@0BBWWWWWWMM@Z7;;MW       
+echo;                    ;MW@MS .,::r:::i:.i2X.,::i:i:i::,::i,:,,27.::;,:::::.iWWBBBWWW@MWarrrrZM        
+echo;                     BMM8 .,:,ri:::,::Xai,:,;:::i:i:i:::i::.a7.,i;::i:i:, SMB0WW@MMZr;XX7rM2        
+echo;        ir;:          MM. ::,ir:,i,,,7SS.,,;r::::i:::i:;i:.,ZS.,:r::::::,.,@WWBMM07;7XX7rMM         
+echo;      BBaX2ZWZ        ZZ ,:::r;::::.;7Z7.,:X;.:::::::::i;,,:BS,.:ri.:::::. aMBM@Si7XXXX7WMi         
+echo;    .MX      0M       a:.::,iX:::i,iXXZi.,iSi,::::::::,;i,.rWS:,.Xi,:::i::.iMMWr;XXXXXXBMX          
+echo;    Mr       iM      ;0.,::,rri,:,:r7X0:..7X;.:,i,i:::,ri..X@Xr..S7.::i:::,.WMSrS2aaZa@M@           
+echo;    M       iM:      ZX.,:,,X7::,:;X;80: :XXi::::i:i::,7i.:ZWXrr 2X.::::::,.2MZ22SXri;r@2           
+echo;    BM     8M,       B;.::,:ar:,::7r78X:.iX7;.::::i::,iX,.XX0Xr7,S2.:::,i:: X@r:i:.     iS.         
+echo;     ,    MW        iW:,,:.;Zr,,.i77X2;i rr7;,:::::::,r7.;ar2S;X;2a.:i:::i:,rX.;i.       ,Z,        
+echo;          M,        X8:,::,;8i,,,:aSa7Sr,;;;7,:,:::,,iXiiS2.7S;;Xa8.,::::::.;Zi;:       . ,Z        
+echo;          .         SZ:,,:.;8;.,.iZ27 Sa:;i;ri,:,i:,iXri78i ,a;;78Z.:i:::i:,:8;;:      .   77       
+echo;           .;       2ai.:i,i07i  ,rX, :2i:;i;i::i,,iX;;;BS,,.XS:SZZ.:i:::::.,8;r;.         .M       
+echo;           8M:      2ai.:;;,00@S;S2X   XX7,ii;::,::7;iiZX    .2;aZa,,;,:::::,8;;r;,.   . . iMr      
+echo;                    2ar::iX,aaBaSWMB0; :8Z,,::i.,ir::i2i      iXSZa,ii::i::,ia,,:::,,.,,:. 2WX      
+echo;                    SZri,iX:i::iBB0BMMX r2iri:ii;;:;7Xi  ...   i:Sa.ii::::i,i7 . .....   .XX8X      
+echo;                    X8r;,:XX:  iMB00BX. .::;;i;;;77XZB@MMMMMMMMB2Sa r:::i,i.;8:         XZi.Br      
+echo;                    :W;7iirar. ,BBW@@0          .,.i.. WWBBWWWMBWW7,;:,:::;.;MB27ri;rXaW0i iWi      
+echo;                     07;ri;XZ;  XrSS2Z  . . .         :MW000Bra  rii;,::,,; SWBa000WWW07...iB       
+echo;                     2a;;i;7aX,  . .,: ... . . . ...  XM8WWW0MS  X:r::,:,ii.ZB0ZZa007i...,.XB       
+echo;                     7Biri;rX,7i.      .. .........   i2rrSXSZ  ;r;i,::,,ii:WZ0ZXiZS  :::,,20       
+echo;                     rW;;;;77.,;:,.. . ... . . ... ..  , ...i. .7X;:,i,::;,SW808rrZ7 :::,,,0X       
+echo;                     rB;;;;;2..,:,,.,.... ... . . ... . ...,..,;Xr:.ii:,ii:80Z0Z77Z:,::::.iB,       
+echo;                     X8X;;;;XX.  ....... . . ..... ....,,::i:irS;i,:7:,:;i;Ba808;72:,:,:,.rW        
+echo;                     aaSX;r;r7Sr     .. . ..... . . ..,,::::;:SXi,:7r,,:r:22S8BZ;X2.,::::.aZ        
+echo;                     ZXXX;;r7;2MM2        .,,..... . . ....: i7i..rXi,:rii8;XB0Z;SS,,:::,.8r        
+echo;                     Zr72i;77Z2:2MM8r         . .   .       .X: .rXr:,i;iXZ.70WZ;XS.:::::.W.        
+echo;                     Wi7a;;XZ2    2MMM0a;.           ..   .;X, :XS7;.i;;iZX.r8BZ;XX.,:::,iW         
+echo;                    iB:r2i;ZZ     ,S@BWMW808Z277222XXS72ZSMZ  XZS7r.:;;:XS7.r2@ZrXS.::::.rB         
+echo;                    XZ,X7iaB: .;r;:,.  ..:i7a8ZZ2X;i.. 7ZX7:2@ZXrr:i;;:7XS;,;7M0;XXi.:::.XZ         
+echo;                    Zr:a;SM0X;i:,,,,,.,.,..   :..     .7S;;B@27;r:i;;:7X72i.rrMBr7Xi:,::.Xa         
+echo;                   .B,X2ZMZ;.,,:,::,::,::,,:,,,,,:.    a7XWB7;;7iii::7XX72,.;X@W;XXr:,::.XS         
+echo;                   ZS7aZMX. .  .,,:::,:::::::,,::,i:. ,ZZ0Si;r7ri:,iaX7rXS,.;2a0X7Sir,::,i@2Z2:     
+echo;                  rMi;:8S. . r;..:::::::::,:,. .,::i,iaZi::rXXr::7a@arr7XS.,;0;S2X2i7:,:..MMMMMMi   
+echo;                  0i. 2Z,., aMMr ,:,:::,:::. :X..,:,,.7ZSSaZ2;rSaBM87;X7XX,.;0,;8rZi7i,:, 8MMMMMM   
+echo;                 ZXr72Wi., :M@M2 ,::::::::, rMMB ,,::.:a@ZS;:Xa7 7@2;77XXS..iB  8rar;r,:: 7MMMMM2   
+echo;                a2227aZ.,,.XZr8;.,:::,::::,.M@@M..:,:.:XZ::72S:  rM7rr7rSX..i0 :M;ZXir:::.iZ        
+echo;               a2SX::2X .:.rSX7.,:::::,:,: 70rSZ ,,::.,XZ;22X, , rWrrXrrXS..,Z;MM;aa;;,::, 8        
+echo;              Z2.Z7iiZX   .,7X:,,,:::::,:,.72r2:,:i:, SZ00XXi ,, rB;777;SS...WMMM7aa77:,:,.Xa       
+echo;             ZS,.X2778a. .:,.,,,::::::,:,:,:7Xr...  ,aZ;.7ZS ,,, 78r7Xr;Xa.  MM@MSS8;Xi,::.iB       
+echo;            0X,,.iB77X87:,,,:,,,:::::::,:,:,..,.   iZ7.   .a ,:, 78r77r;XZ, :M@WMZX8r77,i:,.8X      
+echo;           Br,.,XBB8;rXZX:...:,:,:,:::,:::::,,,, :2S..:.   a :,, XZrrX;;r8, 0MWW@WS8r7X:i:,:XZ      
+echo;         .B;, iaM0ZW0X7;XaX;,...,,,,:,,,::::,.,.XB7 ,:::. aX .:. 2Z;7Xr;;8i:M@WWMMZ8rrXi;,,:i0.     
+echo;         B;. X@MB20ZraaX.,7ZZSr;,,,,.,...,.,.,:Z0i ,,,. ,aB; ,,. BZrrX;;i2XBM@WM0;B8;7X;i:,i:Z;     
+echo;        8X..ZMi02aBi;;2BZr  ;X2aZ22SSXXr7r7r7S02. :.. ,XB8XSXr: ,@a;7XriiiWMWW@M: MZ;7Xri,:iiSX     
+echo;       Xa..aM  BX0ZirrXX0Sa;  .:i;rXSaaZZ88Z88;    .i20BS;:i;;, XMZ;rS7i:,WMWWMM .M2;XX7::,r:XX     
+echo;       0:.i@  :0X8BiiXXX  :8;.,,,    .,.,.,.,  .;rS8Bai   ....  8W8r;XS:.SMBBWM: ;MrrXXi,.;;:SX     
+echo;      :0..2r  ,B7ZW8;rXX   Zr,:.       ,,.  :7aZZZS7:. ,,:,:,. 2SB0Xi7X,2M000MB  ZW;rXr, 7Xi,Z;     
+echo;      ,0.:0    WXX0BW2aX7,ra;,           .XZZ2S7X,. .,,,,,:,. SarB0aii8B@800MB0  @Sr7r.,a2i:;8      
+echo;       a2rB    ZBSaB@MMMMMZZ;,          .BBZSSS2i,,::i:i:::::a0X2MMM@MMMW@MMB8a00WXS2SaWZ;i;0;      
+echo;        r,r     7:,.:i;;7:::,  .. ..... ,r:,:,:, .......,...;;,,iXXrriii;iX: ,i7X.::;r7: ..ii  
+cd /d %~dp0
 echo.即将根据您当前的aria2配置信息（port,token和rpc-secure）来生成annie配置文件，这可能需要3秒钟的时间。
 echo.在大多数多数情况，这仅需配置一次。
 echo.如下次需跳过此过程，请从隐藏传送门进入。
@@ -295,42 +406,407 @@ cd /d %~dp0
 cd .\data\Program\plugins
 echo.您确定要删除annie么？Are you sure to delete annie?
 pause
+echo;                                                                                                    
+echo;                                      .:rr7XXS222SSXXXX;:                                           
+echo;                                 .iX2a22SXX7rr;;;;;rrXSaaZaXi                ..,,                   
+echo;                              :XaaS7;ii:i:i:i:iiii;ii::,::irX0@SXa80W@MMMMMMMMMMMM                  
+echo;         rZ8a2XSSSS2S2XX72802227i::;ii:::,::,:::,i:ii;iiiiii:;0MMM@M@@MM@@@@@@WMMM,                 
+echo;        ,MMMMMMMMMMMMMMMMMMZ7i,:;i:,,,:::::::::,:::::,ii;i;ii, i0MB0BBWBWWWBWW@@MM                  
+echo;         MM@WWBWWWBWBBBM@S..:ii7i,:::::i:iir;;ii::::,,,::ii;ii:. ZMWBBBWBWBWWMWXBW                  
+echo;         0MBMWWBWBBBWWM0: ::iiX:,ii,::i::7,.iiii;;;rrr;;;ir;r;;i: 8M@W@WWWWWMWr7Mr                  
+echo;         .MS8MWWBWBWWM2..i:iiSi,ii,:::::iX           ..,,::;777rr;;MMMMMMMMMWXrMM                   
+echo;          WMiZMWWBWWMS ,ii;,Sr:i;,:::::.ri                          ..i;7XZZ7XZMB ...               
+echo;           MaiZMWWWMZ :iii.rSii;,:::ii,,7,                                       ::;;r;r;;;;i:..    
+echo;           aMriZMWMW..ii;,:2ri;i:::ii::.a                                                 .,,:i:S:  
+echo;            M@;;8MM; ii;i.rS:i;i,:,r::.;8                     .MX    ;.                         7,  
+echo;            iMa;;MB :i;;:.2;iir,:,:X:,.22                     rMM   ;M2                         a   
+echo;             BM7;MX.:iii.;aiir;:,,;7,,.B:                     iMMr  ZM7                        .X   
+echo;              M@7Z,,ii;: X2:;7;,::X7,.iB                      .@MX  0M;                        i;   
+echo;              :MW2.iiii: aXi;7::.;SX. X0                      .MMS  8Mr                        7,   
+echo;               XMS.iii;,,8ri;r:,,72X, 8S                      ZMMi  2MB                        S    
+echo;                WS,ii;i.:Bi;;X:,:XSX..Bi            iZZZ888B@MMMX    BMMZ2Xrii.        . . .  .2    
+echo;                X7:i;ii ;0;irS:.rr2X::W             X@@WWBB8ZSr       ;aW@MMMMMS  . .   . .   i7    
+echo;                2X:;i;i.;0;:XB,,r7SX:;8                                       .      . .   .  ri    
+echo;                2X:i;i;.;0X,S0;.77WS;7S             .XBMMMMMMMZ:      iXZZZSr:      . . . .   X     
+echo;                S2,ii;i,i0Z;7ar,;7ZX:Zi            7MWSr:,.:;8MMX   ;MMMB00WMMMZ .   . . . .  2     
+echo;    .;;         XZ:i;i;:i88;;i7.iSiX72.                       aMM  :MMr       i,  . .   .    :S     
+echo;   i8MM         ,0,ii;i:,8Z2X72iS0rZ8S                        rMMi aMZ           . . . . . . 7i     
+echo;     7M;i@       Zi:;ii:.ZB0MMMZMM8X7X                        a@M. ZM2            . . . . .  X,     
+echo;    M aB B,      Zriiii;.8; ;BBBW8  .r                       .MMB  8M8   .   .       . . .   S      
+echo;    a;           7a,iiii:XX  S0BWW  ,,                       SMM;  7MZ  . . .   .   .   . . ,S      
+echo;      B:         ,8:i;iiriX  B@WBM. :.                        ;i    :.     . ... . . . . .  ;r      
+echo;      MM0Ma       Wiii;,727: :WZ8B7 ,:iii::..                                 . . . .   .   X,      
+echo;      S@ :        B7:iii,aZX  ;ri;:  ..:;77SXSXSX7rri;i:,.                               .  S       
+echo;           20     0S:i;i,,0aX.      .     . ,,i;77XXXXXXX7S8aSa: .Xr;i:.                    2       
+echo;           rM;    aZ.ii;:.r2iXi, .......         .,:i;rrrXZ0a80  iW@M80B08ZZ2a27rrrr;;::.. i7       
+echo;                  aB,iiii:.S;           . ,:,:.           :22Ba  XZZBXXX22aZZWM:  ,,;;7rr7rZ;       
+echo;                  2M,ii;:r.iMZ7i             ,          :X8rrW;  Za80SXSXXXX7aW                     
+echo;                  aMi:;i:ri WWW@WB82S7rii:, ...,,.:;7aW@@WB,28   Z2ZW2S22SSXXXM.                    
+echo;                  XWX:i;,;7 aBZZ800WWMM0aZZ0XXXXXr8ZSSXZ0Ba:WB  :ai2W2rXX22aSSMi                    
+echo;                  SSZ.ii,iS.7BZZZZ88BZXrXXXXaXi:irZ7X7rrXa72MZ  XS;SW2;,.:r7XX@7                    
+echo;                 :2i0:i;,i7r.BZZZ80B2S2X7XXXX227:SX7;;;22aX8@X  SXiSW8;i ,.,,:S2                    
+echo;                 7S 0;:i:irS:SBZZ00i;Sa2XrXrr;rXaXir28SX8Z2r8: .ZX;XB0Xi,::,,.:2                    
+echo;                 Zi 22:i::rSa:8Z80.  ,7ZZS7X2a22XXaWMMMZ8SrX2...:77X0BSr.i::,:,a;                   
+echo;                 Z..iZ::i:;X@XX80Z  ,. ,SaS8@0WM@WMMMMMWZXXSZ : :,2Z00ar:.i:::ira                   
+echo;                XS.;.S;iiii2B02880 .,,.. ;X2080MMM@ari,,:ZZXr  SZSr0888r;,::,,iiZ.                  
+echo;                Z,;r.2S,ii;2BZ8ZB@; ,,,,.:XX@M027        .ai ,:XS7r08ZB7r,i:i,iiSX                  
+echo;               ia,ri,Sa::iiZ8ZZZZWB. :,,,::XX;    .,.,,,. i0i,,aXrXBZZ02r::iii:riZ                  
+echo;               2riSi;72X,::a0ZZZZZ@X .,.iXXi  ..,,:,,.,   :W, ;277a8ZZ0ari::i::riZ:                 
+echo;               Z,7Wi7XrZi,.20ZZZZ8Bar  ,;r..,,,:,,..  .:i7Z8  XXr2S8ZZ88r;:iii,iiX2                 
+echo;              XSi88:Xrr7Zi rBZZZZ08:2X.   ..,.,....:irS2ZZZ;  SX0XS8ZZ887;ii;:.;riZ                 
+echo;              a;27XiX7r;@Bi aBZZZ@X ,ZZr,.   ..:i7Xa2ZaaSS2: .B00a82ZZZBrriiii.2Z:Z                 
+echo;             ,ZXr.a;Xr;Z0 X7iZ8a0B. .,S0ZSXr7X2aZaZ2SXXrXXZ  ;@0B8ZX8WZ07;;:ii:XS7a:                
+echo;             X2Z i2777rM,  BaS00WX ... rSZ8000Za22X77XXX7Xa  70B8Z2SZB0Brr:i:;i2 2Z;                
+echo;             28r ,Z77rSB   XBXZBW  ,,,. .,i;ri:,:r2XX7XXXSr  XX88Z2S0iB8;ii:;7XX rW:                
+echo;             Z8   ZX7rZ2    @SXWS .:,:,,.. .   .. :SSXXXXSX:;SrZ0ZX2B 2Z,i:iXSZ  XM                 
+echo;             Ba   aZ7;B7    X0S8: :,:::,,,:,:,:,,,..72SXXXSS2X7XW2XZ2 Z;:,:XZ8, .@X                 
+echo;             @2   ,M7;07     808 .::,:,:::::::,:,:,, ;SSXXXXXX7782X0,X7.,;20X   7;                  
+echo;             XM    2W7WZ      WW.,::i:i:::i:i;i:i:i,:.iXaSa222aSB8BBZ2X8WMMW                        
+echo;              rS.   X;;S       X ......,.... ,,.......  :;i;i;;i;XX.  i8XXa,  
 rmdir /S /Q annie
+del /f /q annie.7z.exe >nul 2>nul
 echo.删除完成，按任意键返回。
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto plugin
-:Remove-compatible-module
+:Remove-compatibility-mode-module
 cd /d %~dp0
 cd .\data\Program\
-echo.Are you sure to remove compatible-module?
+echo.Are you sure to remove compatibility-mode-module?
 pause
 rmdir /S /Q original-edition
+del /f /q  compatibility-module.7z.exe 2>nul >nul
 echo.
 echo.
 echo.删除完成，按任意键返回。
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto plugin
-
-:update-plugins
+:update-plugins-faq
 echo.
+echo.如您需要更新已安装的插件/模块，只要删掉原插件，下次启用会提示是否需要联网获取下载。
+echo.更新频率为数个月一次，联网下载的版本一般都为最新版。
+echo.一般无需手动更新，插件会随软件本体的更新而更新。
+echo.目前仅支持64位版，32位系统请勿使用联网获取插件的功能。
+timeout /t 3 >nul
+echo.您已在本页停留超过3秒钟时间。
+echo.发现神秘空间间隙！ 是否前往？
+pause
+cls
+echo;                                              .,ii;;7r7;iii:,                                       
+echo;                                         :iXS222SSXXXXXXXXXSSaS2X;.                                 
+echo;                               .::iiiSZ20aSX7;;;;;r;r;r;r;r;r;;;XX2SXi                              
+echo;                ;MMMMMMMMMMMMMMMMMMMMMZS;iii::,:,:,:,i:;;i:;;;;;;;ii;77r                            
+echo;                :MMMM@M@M@M@MWWBW@0S;,:::,:,:,:::::,:::,iii.::iir;r7SS2Xa2:.,                       
+echo;                 MM@WWWWWWBWBBBMB7:,,i::,::::i,i:i::,i::,:ii,:,,:;;70MM@WMMMMMMMMMW8aSr;,.          
+echo;                 iM@WBWBWBBBBW@2:..:i:::::::i,i:::i:::i::::;i,:::,:i:X@B00BBWWMMMMMMMMMMMMMMMM@     
+echo;                  WMWWBWBWBB@W;. ,:i,i::,:;;,i:i::::::::::,;;,::::,,:,7WB08B0WBWW@WWW@WWW@@MMM2     
+echo;                  .MMWWWBBBM0, .:::::::::7;:i:i::,::i::::::iX,::i:::,::7W000BBBWWWWBWW@W@MMWMM      
+echo;                   8M@BWBWMZ ..::i,i::,,7X,:,::i:::::i:::i::Si,::::::,,:X@00BBBWBWBWW@@MM0XSM;      
+echo;                    MMWB@M2 .,,:;::::,,;Z:,:i:i:::::i:i::::.2;,:ii:::::.,Z@0BBWWWWWWMM@Z7;;MW       
+echo;                    ;MW@MS .,::r:::i:.i2X.,::i:i:i::,::i,:,,27.::;,:::::.iWWBBBWWW@MWarrrrZM        
+echo;                     BMM8 .,:,ri:::,::Xai,:,;:::i:i:i:::i::.a7.,i;::i:i:, SMB0WW@MMZr;XX7rM2        
+echo;        ir;:          MM. ::,ir:,i,,,7SS.,,;r::::i:::i:;i:.,ZS.,:r::::::,.,@WWBMM07;7XX7rMM         
+echo;      BBaX2ZWZ        ZZ ,:::r;::::.;7Z7.,:X;.:::::::::i;,,:BS,.:ri.:::::. aMBM@Si7XXXX7WMi         
+echo;    .MX      0M       a:.::,iX:::i,iXXZi.,iSi,::::::::,;i,.rWS:,.Xi,:::i::.iMMWr;XXXXXXBMX          
+echo;    Mr       iM      ;0.,::,rri,:,:r7X0:..7X;.:,i,i:::,ri..X@Xr..S7.::i:::,.WMSrS2aaZa@M@           
+echo;    M       iM:      ZX.,:,,X7::,:;X;80: :XXi::::i:i::,7i.:ZWXrr 2X.::::::,.2MZ22SXri;r@2           
+echo;    BM     8M,       B;.::,:ar:,::7r78X:.iX7;.::::i::,iX,.XX0Xr7,S2.:::,i:: X@r:i:.     iS.         
+echo;     ,    MW        iW:,,:.;Zr,,.i77X2;i rr7;,:::::::,r7.;ar2S;X;2a.:i:::i:,rX.;i.       ,Z,        
+echo;          M,        X8:,::,;8i,,,:aSa7Sr,;;;7,:,:::,,iXiiS2.7S;;Xa8.,::::::.;Zi;:       . ,Z        
+echo;          .         SZ:,,:.;8;.,.iZ27 Sa:;i;ri,:,i:,iXri78i ,a;;78Z.:i:::i:,:8;;:      .   77       
+echo;           .;       2ai.:i,i07i  ,rX, :2i:;i;i::i,,iX;;;BS,,.XS:SZZ.:i:::::.,8;r;.         .M       
+echo;           8M:      2ai.:;;,00@S;S2X   XX7,ii;::,::7;iiZX    .2;aZa,,;,:::::,8;;r;,.   . . iMr      
+echo;                    2ar::iX,aaBaSWMB0; :8Z,,::i.,ir::i2i      iXSZa,ii::i::,ia,,:::,,.,,:. 2WX      
+echo;                    SZri,iX:i::iBB0BMMX r2iri:ii;;:;7Xi  ...   i:Sa.ii::::i,i7 . .....   .XX8X      
+echo;                    X8r;,:XX:  iMB00BX. .::;;i;;;77XZB@MMMMMMMMB2Sa r:::i,i.;8:         XZi.Br      
+echo;                    :W;7iirar. ,BBW@@0          .,.i.. WWBBWWWMBWW7,;:,:::;.;MB27ri;rXaW0i iWi      
+echo;                     07;ri;XZ;  XrSS2Z  . . .         :MW000Bra  rii;,::,,; SWBa000WWW07...iB       
+echo;                     2a;;i;7aX,  . .,: ... . . . ...  XM8WWW0MS  X:r::,:,ii.ZB0ZZa007i...,.XB       
+echo;                     7Biri;rX,7i.      .. .........   i2rrSXSZ  ;r;i,::,,ii:WZ0ZXiZS  :::,,20       
+echo;                     rW;;;;77.,;:,.. . ... . . ... ..  , ...i. .7X;:,i,::;,SW808rrZ7 :::,,,0X       
+echo;                     rB;;;;;2..,:,,.,.... ... . . ... . ...,..,;Xr:.ii:,ii:80Z0Z77Z:,::::.iB,       
+echo;                     X8X;;;;XX.  ....... . . ..... ....,,::i:irS;i,:7:,:;i;Ba808;72:,:,:,.rW        
+echo;                     aaSX;r;r7Sr     .. . ..... . . ..,,::::;:SXi,:7r,,:r:22S8BZ;X2.,::::.aZ        
+echo;                     ZXXX;;r7;2MM2        .,,..... . . ....: i7i..rXi,:rii8;XB0Z;SS,,:::,.8r        
+echo;                     Zr72i;77Z2:2MM8r         . .   .       .X: .rXr:,i;iXZ.70WZ;XS.:::::.W.        
+echo;                     Wi7a;;XZ2    2MMM0a;.           ..   .;X, :XS7;.i;;iZX.r8BZ;XX.,:::,iW         
+echo;                    iB:r2i;ZZ     ,S@BWMW808Z277222XXS72ZSMZ  XZS7r.:;;:XS7.r2@ZrXS.::::.rB         
+echo;                    XZ,X7iaB: .;r;:,.  ..:i7a8ZZ2X;i.. 7ZX7:2@ZXrr:i;;:7XS;,;7M0;XXi.:::.XZ         
+echo;                    Zr:a;SM0X;i:,,,,,.,.,..   :..     .7S;;B@27;r:i;;:7X72i.rrMBr7Xi:,::.Xa         
+echo;                   .B,X2ZMZ;.,,:,::,::,::,,:,,,,,:.    a7XWB7;;7iii::7XX72,.;X@W;XXr:,::.XS         
+echo;                   ZS7aZMX. .  .,,:::,:::::::,,::,i:. ,ZZ0Si;r7ri:,iaX7rXS,.;2a0X7Sir,::,i@2Z2:     
+echo;                  rMi;:8S. . r;..:::::::::,:,. .,::i,iaZi::rXXr::7a@arr7XS.,;0;S2X2i7:,:..MMMMMMi   
+echo;                  0i. 2Z,., aMMr ,:,:::,:::. :X..,:,,.7ZSSaZ2;rSaBM87;X7XX,.;0,;8rZi7i,:, 8MMMMMM   
+echo;                 ZXr72Wi., :M@M2 ,::::::::, rMMB ,,::.:a@ZS;:Xa7 7@2;77XXS..iB  8rar;r,:: 7MMMMM2   
+echo;                a2227aZ.,,.XZr8;.,:::,::::,.M@@M..:,:.:XZ::72S:  rM7rr7rSX..i0 :M;ZXir:::.iZ        
+echo;               a2SX::2X .:.rSX7.,:::::,:,: 70rSZ ,,::.,XZ;22X, , rWrrXrrXS..,Z;MM;aa;;,::, 8        
+echo;              Z2.Z7iiZX   .,7X:,,,:::::,:,.72r2:,:i:, SZ00XXi ,, rB;777;SS...WMMM7aa77:,:,.Xa       
+echo;             ZS,.X2778a. .:,.,,,::::::,:,:,:7Xr...  ,aZ;.7ZS ,,, 78r7Xr;Xa.  MM@MSS8;Xi,::.iB       
+echo;            0X,,.iB77X87:,,,:,,,:::::::,:,:,..,.   iZ7.   .a ,:, 78r77r;XZ, :M@WMZX8r77,i:,.8X      
+echo;           Br,.,XBB8;rXZX:...:,:,:,:::,:::::,,,, :2S..:.   a :,, XZrrX;;r8, 0MWW@WS8r7X:i:,:XZ      
+echo;         .B;, iaM0ZW0X7;XaX;,...,,,,:,,,::::,.,.XB7 ,:::. aX .:. 2Z;7Xr;;8i:M@WWMMZ8rrXi;,,:i0.     
+echo;         B;. X@MB20ZraaX.,7ZZSr;,,,,.,...,.,.,:Z0i ,,,. ,aB; ,,. BZrrX;;i2XBM@WM0;B8;7X;i:,i:Z;     
+echo;        8X..ZMi02aBi;;2BZr  ;X2aZ22SSXXr7r7r7S02. :.. ,XB8XSXr: ,@a;7XriiiWMWW@M: MZ;7Xri,:iiSX     
+echo;       Xa..aM  BX0ZirrXX0Sa;  .:i;rXSaaZZ88Z88;    .i20BS;:i;;, XMZ;rS7i:,WMWWMM .M2;XX7::,r:XX     
+echo;       0:.i@  :0X8BiiXXX  :8;.,,,    .,.,.,.,  .;rS8Bai   ....  8W8r;XS:.SMBBWM: ;MrrXXi,.;;:SX     
+echo;      :0..2r  ,B7ZW8;rXX   Zr,:.       ,,.  :7aZZZS7:. ,,:,:,. 2SB0Xi7X,2M000MB  ZW;rXr, 7Xi,Z;     
+echo;      ,0.:0    WXX0BW2aX7,ra;,           .XZZ2S7X,. .,,,,,:,. SarB0aii8B@800MB0  @Sr7r.,a2i:;8      
+echo;       a2rB    ZBSaB@MMMMMZZ;,          .BBZSSS2i,,::i:i:::::a0X2MMM@MMMW@MMB8a00WXS2SaWZ;i;0;      
+echo;        r,r     7:,.:i;;7:::,  .. ..... ,r:,:,:, .......,...;;,,iXXrriii;iX: ,i7X.::;r7: ..ii   
+echo.以下是某个萌新的胡言乱语：
+echo. (っ °Д °;)っ未来可能不会增加的插件：
+echo.①第三方网盘+压缩插件
+echo.完美地将aria2下载功能与第三方网盘的上传功能结合在一起！
+echo.当您使用aria2下载完成后，能自动备份/同步到第三方网盘，您也可以在备份完成后自动删除本地文件。
+echo.压缩插件介绍：
+echo.当您在上传到第三方网盘前，可能需要对文件进行固实加密分卷压缩，并添加属于您的专属标记。
+echo.而压缩插件存在的意义就是您可对aria2自动下载完成的文件进行高度的可自定义化压缩操作。
+echo.为了提高效率，你仅需配置一次压缩操作，并转存为特定的配置文件。
+echo.之后都会根据配置文件来实现自动化操作。
+echo.进阶型操作：根据不同的下载类型，使用不同的压缩配置。
+echo.②自动分类插件
+echo.aria2下载完成后，对文件进行自动分类。
+echo.你可以自定义文件的分类类型
+echo.初级分类：根据文件后缀名进行分类。
+echo.高级分类：以某部作品的发行的年份进行分类，或以制造商、作者、风格类型等属性进行分类。
+echo.进阶型操作：在分类完成后，自动补充文件的详细信息，并存储为markdown或word(docx)格式。
+echo.那么问题来了：markdown是什么格式？
+echo.预览：https://m.tmoe.me/home/Anime/2020/1月
+echo.点击文件夹名称，您将能看到作品的详细信息。
+echo.这些信息以markdown格式存储。
+echo.这可能是一种比word更优雅的文档格式(删掉，括号5毛o(=?ェ?=)m)。
 echo.Welcome to 施工现场
 echo.这个功能还在做呢！
-echo.※咕咕咕，在做了，已经在做了，进度0.001 % ※
+echo.※咕咕咕，在做了，已经在做了，进度0.00001 % ※
+echo.未来可能不会增加的插件(完)
+echo.2020大年初一注。
+echo.Aria2MoeManager开发者
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto plugin
 :delete-rssbot
-echo.您还未安装此插件。
+::waifud
+cd /d %~dp0
+cd .\data\Program\plugins
+echo.您确定要删除waifud么？Are you sure to delete waifud?
+pause
+rmdir /S /Q waifud
+del /f /q waifud.7z.exe 2>nul >nul 
+echo;                                                                                                    
+echo;                                                                                                    
+echo;                                            ::ririrrrii::.                                          
+echo;                                     ..ru1JX2jv777r777vjJIUU1j:.                                    
+echo;                                  iv1ULri::...:::::::.:.:.::i71KKJi                                 
+echo;                              .7u17i...:.:::::...:::::::::::::.:iJSPu:                              
+echo;                            :jUr:.:::.:::::.........::..:::::::::7RQQBMEqjr..                       
+echo;                         iqXYi.:::::.:::::...........::...::::::...sMDqdDQBBBBQgS7.                 
+echo;                      idBBJ...::::..:::::.............::....::::::. :PgSKqPPEZQQBBBBBQqv.           
+echo;                  :IQBBBI....r:::. :::::..............:i.......:::::..JQPPqPPdEZZDDgRBBBBBQg        
+echo;              :JMBBQDdBs .:.ii::. .i:::................ri ......:::::. 7QEdPddZEZEDZgDMQBBBj        
+echo;         i1gBBBBQDbEbBs .:.:i::...ii.:.................ir........:::::..iQZEPEdDEDZgRBMSvBi         
+echo;     JBBBBBBQgDEDbEdBS .::.i::....v.::.................:7.....:....::::. iBddbZdZZQBRJ:iBs          
+echo;     qBBRgDDEDEZdZdBD .:::.r::.. i7.::.................:v......:....::::. IBbEdZDBQu:.7Bu           
+echo;      :QBMQDZEEdDdMB: :::.:i:... 7r.:.............i.....1:.....::....::::..QgdZgBSi::uBY            
+echo;        PBdQQRZgEgBU :::..i:.... Si.:............:r... .u7 .....:....::::. JBDQQ7:iiXBr             
+echo;         .PqqQBDgMB...::..r:... .P:.:............:7:....Ju......:.....::::..BBDir7sBB.              
+echo;           7q7PBMB5 .::: :r:... :b:............. :r: ..:71:.....::.....:::. ZBrvLrr5i.::            
+echo;            .M7vBB: :::. i7.... vS:.:............i7i...:77v.:...::......::: IRi.       :v7          
+echo;             .d1YB .:::. rr... .Lb..:............rri...iv:s:.....i......:::.rs           .U.        
+echo;               YBK .:::..vr....:LP:.:............rri. .iY.rJ::...i......:::.:Y             S        
+echo;                rd :::..:Li....ivE:.:...........:rii  :ru..Iii...r.......:::.j.            ir       
+echo;                .q.:::..iv7.. ::L2r.i...........rrr: .:L7  i5:: .i: .....::.:u..           :5       
+echo;                .E.:::..iv7r .::LJvrr:........ .rri. irK:   U7:. i:......:::.J.:..         Yi       
+echo;                 E.::...ivi7 .i:UrJiL:.........irii .ijs  . .U7i :i......::.:L............:P        
+echo;                 E.::...:2:X..:.v:vir:........:rii:.:r2.     :2I::i......::::r   ....:::.:q:        
+echo;                 ur.::..:5iQ: ::J..7:i.......:r:::.:rJi       7vL:i .....::.iL        .:7qg         
+echo;                 r1.::...S7s7 :ir  i:U......:i:::::ss7          .7i..:...::.:QbYii:ii7sI7rU         
+echo;                  d.:::..sIi1.7iJ: .rvv....:i:::rr7j7 ...:::ii7rrPP ......:.rMvIUU5Ujr:. .d         
+echo;                  2r...: vQgEKBBBBBBBMv7i::iirirr.:i SQBQBBBBBBBQgB. :...:..Yg:r .     . :P         
+echo;                  vI...:.rj  7QSSuSqqr  :::..          :BSS2SXvrr r .:......5Pii ........:E         
+echo;                  :g.:.i.:r  .MbPZbK:.                  DbPdPd1r  r ::......Pqi: :.......:I         
+echo;                  .B...:i.r   iLLJE5Pr                  LivSv7v7  r i.......gSi..........iY         
+echo;                   Bi.:.ii:7.  :......               .  .... .   v.i:......:gSi: ....... 7r         
+echo;                   DK.:..rL7i ...                     . . ..... i::r...... rQXi. ....... 7:         
+echo;                   PM..:..uuir:.....                   ....... .i7u. ....: 5PDr. :...... Y.         
+echo;                   Ig:..: is .:.. . .                   ......:ijX: ....:..PrZL. .:..... J.         
+echo;                   XYv ... Yi                                . .5r .....: vS.II: .:..... U.         
+echo;                   d:7......LPr             i::.i:            .2v .:..... Xv.iRi..i..... 1.         
+echo;                  .d.r .... :QggKY:.         .            .:YdB2 .:....: IvL. QL. i..... U.         
+echo;                  L7iv ..:. .dq5PdgDMgPJr:... . . :.:ivs1u2v5Mb  ::...: vP:s. K5: i:.... s.         
+echo;                  Z.i7 ..i:  XK52I2bPU7jruLjsJJ127i1X1Lv7riiLX. ::...i.rDiiY. rQ: ii.... L.         
+echo;                 .D :r ..:v  sd22Iduiir777riiirirvvviiiiriisD. ::. .i.rD7:77. .Qs ir.....ri         
+echo;                 U7 :v ...Ii rES2dYir7rv1777ii::r12r::ii:rLbi .:. .i:ug7:i7i . Mg .v.....iJ         
+echo;                .Z: rv ...sI..PXZ1:..   .ruQgP5ji:irXbQPrvKv .:..:rsEDY:ii7:.. UB:.s....:.S         
+echo;                JU. vL ...iXr rBU.   .    1BUPRQq1PQDEDgivI....isS1LEbr:irr: . vuv.5......s.        
+echo;                D:  I7....iiMi I  .   .   :Bus5BBBg2JvPi.J:..i55v:.:Jg7:iir:.. vr7:I: ....iJ        
+echo;               uL. .Ir.. .i:dgYir  .:::. .QBdgDQrsBMdPBZ7v.:1Z7    .:Z7:iiri . JiivX: ...:.5        
+echo;              .E:. :2r....i7DZr.jIXr:.:::rPDQEEd.:QDQMRS7iirLrYi.   .K2:riii.. J7 SXi ...:.iL       
+echo;              u7:..rY7.: ::2ZP   .ii::. ... :72r  vqii:        iUv.  KS:riir.. 2r Kdi ...:: 1.      
+echo;             .d:r :rvL.:.:iXdU      ..... :.        ..  . ..... .i:. 1K:r:ir. .27 qgi ...::..E      
+echo;             2rii :7ij.:.:idPd.. ......... r.  ... .v  .........     51:r:ir.  Xi vBi ...::r is     
+echo;             d.rv ir:sr.:.igBQv:  .......  ri .... iL ......... :   .Mviu:ir: .S: :Bi ..:::vr Y.    
+echo;            7L.D5 rr:i1:..rg:QX5.        .rE...... .S:         ::   KMivR::ri .P. .B: ..::.Jj:.2    
+echo;            Z.s7J iri:7P: r: B5Edi::..::i7s  ...:.. r:::::::::7ri.rPZKi1J7iii :E  :B. ..i:.7Ri.7i   
+echo;           .5rv X.:7ii:uMuvJ gS5DuY2L7rrrr. .. .i. . :vrYuvYXPYsvgMXIXig Lrii.rP  iB. .:::.7:I:.I   
+echo;           iL1  b::iiii:uB:i7bEqu:rr:...    ....7: .. ...    :vrivg15j15 .5:i:ur  PE  .::..2 :I 1   
+echo;           uYU  su.irii:sR   JQPir7r   ....... :r7 ... . . .  i7i:Sq5uQ.  5ii:E.  B7 .:::::d  Z.L.  
+echo;           5b5   Dri777rBP    QR7Y2:...........:Y5:.......... :JJ75BMB1   PJr1P  1B..irii:Zi  B:K   
+echo;           :ii   .i.....r:     i.::. ..... ... ..i.. ........  :...i:i    ::.r   s: .....:i   r.:   
+echo.删除完成，按任意键返回。
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto plugin
+:check-rssbot
+cd /d %~dp0
+echo.
+::cls
+if exist ".\data\Program\plugins\waifud\waifud.exe" (goto test-rssbot) else (goto download-rssbot)
+:download-rssbot
+cd /d %~dp0
+cd .\data\Program\
+mkdir plugins >nul 2>nul
+cd plugins
+echo.未检测到waifud(telegram rss bot)，按任意键开始下载，否则请直接关闭窗口。
+pause
+::..\original-edition\aria2c.exe "https://m.tmoe.me/down/share/windows/aria2/plugins/waifud.7z.exe"
+..\bin\curl.exe -L -o waifud.7z.exe "https://m.tmoe.me/down/share/windows/aria2/plugins/waifud.7z.exe"
+echo.Download completed and is activating for you.
+timeout /t 1
+.\waifud.7z.exe -y  
+timeout /t 1 >nul 2>nul
+echo.正在清除已下载的缓存数据。
+del .\waifud.7z.exe 
+echo.github地址https://github.com/pcmid/waifud
+goto start-rssbot
+REM goto test-rssbot
+:test-rssbot
+cd /d %~dp0 
+copy /y  .\data\Program\plugins\waifud\config.toml .\data\Program\bat\  >nul
+::start .\data\Program\bat\rssbot-conf.bat
+findstr "rpc-secret=" .\aria2.conf  >  ".\data\Program\bin\rpc-secret.txt"
+start "" ".\data\Program\bat\rssbot-test.bat"
+
+REM cd /d %~dp0
+copy /y .\data\Program\bat\config.toml .\data\Program\plugins\waifud\config.toml >nul
+
+REM findstr /i "rpc-listen-port=6800" .\aria2.conf >NUL
+REM if ERRORLEVEL 1 (goto edit-rssbot-port) else (goto start-rssbot)
+:edit-rssbot-port
+::cd /d %~dp0 
+::start "" ".\data\Program\bat\rssbot-add-port.bat"
+REM cd /d %~dp0
+findstr "rpc-listen-port=" .\aria2.conf  >  ".\data\Program\bat\aria2-port.txt"
+cd .\data\Program\bat
+..\bin\busybox.exe sh rssbot-add-port.sh
+::del /f /q aria2-port.txt >nul 2>nul
+cd /d %~dp0
+copy /y .\data\Program\bat\config.toml .\data\Program\plugins\waifud\config.toml >nul
+goto start-rssbot
+:start-rssbot
+cd /d %~dp0
+cd .\data\Program\plugins\waifud\
+start notepad config.toml
+echo.配置文件说明：
+echo.[service.aria2c]
+echo.url = "http://localhost:6800/jsonrpc"
+echo.#url的值为您的rpc地址
+echo.#secret的值为您的密钥，请手动将123456修改为您当前的aria2密钥。
+echo.[service.telebot]
+echo.token为telegram机器人token
+echo.申请方法：打开https://t.me/BotFather
+echo.在机器人之父的聊天窗口内，输/newbot 
+echo.根据提示输入名称，创建一个属于您自己的机器人账号
+echo.输入/token 
+echo.再选择您刚刚创建的机器人，获取机器人token
+echo.机器人用法：
+echo.打开您的telegram机器人的聊天窗口内
+echo.输/sub url 订阅rss   #url为订阅的rss地址
+echo.输/ubsub url 退订rss
+echo.示例：订阅 Lilith-Raws发布的Darwins Games 1080p繁中版，并在更新后自动推送下载任务。
+echo.订阅格式为 /sub https://dmhy.org/topics/rss/rss.xml?keyword=Lilith-Raws+darwins+game+1080P+CHT
+echo.如果您忘记了之前订阅的内容，请手动编辑数据库内容,该文件位于当前目录下的.\data\Program\plugins\waifud内。
+echo.
+echo.如下次需跳过此过程，请从隐藏传送门进入。
+echo.隐藏传送门：在主菜单下输rss或r并按回车。
+echo.若出现连接失败的错误信息，则可能是您所在的区域无法连接至telegram服务器或您的配置文件内的信息不正确。
+echo.此功能可能无法在国内正常使用。
+echo.启动前请先确保您已将正确的信息写入配置文件中，按任意键启动waifud
+pause
+start powershell .\waifud.exe
+ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto plugin
+::echo.
+::echo.启用该插件需要联网下载，请问您是否同意。(y/n)
+echo.
+::echo.非常抱歉，这里正在施工中，按任意键返回。
+::echo.请非战斗人员迅速撤离施工现场。(っ °Д °;)っ
 :rssbot
-echo.
-echo.启用该插件需要联网下载，请问您是否同意。(y/n)
-echo.
-echo.非常抱歉，这里正在施工中，按任意键返回。
-echo.请非战斗人员迅速撤离施工现场。(っ °Д °;)っ
+@echo off
+cd /d %~dp0
+cd .\data\Program\plugins\waifud\
+start .\waifud.exe
+echo.本插件已切换到前台窗口启动。
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto plugin
+goto plugin
+
 :delete-all
 cd /d %~dp0
 cd .\data\Program\
 echo.
 echo.Are you sure to delete all plugins?
 pause
+echo;                                                                                                    
+echo;                                                                                                    
+echo;                                            ::ririrrrii::.                                          
+echo;                                     ..ru1JX2jv777r777vjJIUU1j:.                                    
+echo;                                  iv1ULri::...:::::::.:.:.::i71KKJi                                 
+echo;                              .7u17i...:.:::::...:::::::::::::.:iJSPu:                              
+echo;                            :jUr:.:::.:::::.........::..:::::::::7RQQBMEqjr..                       
+echo;                         iqXYi.:::::.:::::...........::...::::::...sMDqdDQBBBBQgS7.                 
+echo;                      idBBJ...::::..:::::.............::....::::::. :PgSKqPPEZQQBBBBBQqv.           
+echo;                  :IQBBBI....r:::. :::::..............:i.......:::::..JQPPqPPdEZZDDgRBBBBBQg        
+echo;              :JMBBQDdBs .:.ii::. .i:::................ri ......:::::. 7QEdPddZEZEDZgDMQBBBj        
+echo;         i1gBBBBQDbEbBs .:.:i::...ii.:.................ir........:::::..iQZEPEdDEDZgRBMSvBi         
+echo;     JBBBBBBQgDEDbEdBS .::.i::....v.::.................:7.....:....::::. iBddbZdZZQBRJ:iBs          
+echo;     qBBRgDDEDEZdZdBD .:::.r::.. i7.::.................:v......:....::::. IBbEdZDBQu:.7Bu           
+echo;      :QBMQDZEEdDdMB: :::.:i:... 7r.:.............i.....1:.....::....::::..QgdZgBSi::uBY            
+echo;        PBdQQRZgEgBU :::..i:.... Si.:............:r... .u7 .....:....::::. JBDQQ7:iiXBr             
+echo;         .PqqQBDgMB...::..r:... .P:.:............:7:....Ju......:.....::::..BBDir7sBB.              
+echo;           7q7PBMB5 .::: :r:... :b:............. :r: ..:71:.....::.....:::. ZBrvLrr5i.::            
+echo;            .M7vBB: :::. i7.... vS:.:............i7i...:77v.:...::......::: IRi.       :v7          
+echo;             .d1YB .:::. rr... .Lb..:............rri...iv:s:.....i......:::.rs           .U.        
+echo;               YBK .:::..vr....:LP:.:............rri. .iY.rJ::...i......:::.:Y             S        
+echo;                rd :::..:Li....ivE:.:...........:rii  :ru..Iii...r.......:::.j.            ir       
+echo;                .q.:::..iv7.. ::L2r.i...........rrr: .:L7  i5:: .i: .....::.:u..           :5       
+echo;                .E.:::..iv7r .::LJvrr:........ .rri. irK:   U7:. i:......:::.J.:..         Yi       
+echo;                 E.::...ivi7 .i:UrJiL:.........irii .ijs  . .U7i :i......::.:L............:P        
+echo;                 E.::...:2:X..:.v:vir:........:rii:.:r2.     :2I::i......::::r   ....:::.:q:        
+echo;                 ur.::..:5iQ: ::J..7:i.......:r:::.:rJi       7vL:i .....::.iL        .:7qg         
+echo;                 r1.::...S7s7 :ir  i:U......:i:::::ss7          .7i..:...::.:QbYii:ii7sI7rU         
+echo;                  d.:::..sIi1.7iJ: .rvv....:i:::rr7j7 ...:::ii7rrPP ......:.rMvIUU5Ujr:. .d         
+echo;                  2r...: vQgEKBBBBBBBMv7i::iirirr.:i SQBQBBBBBBBQgB. :...:..Yg:r .     . :P         
+echo;                  vI...:.rj  7QSSuSqqr  :::..          :BSS2SXvrr r .:......5Pii ........:E         
+echo;                  :g.:.i.:r  .MbPZbK:.                  DbPdPd1r  r ::......Pqi: :.......:I         
+echo;                  .B...:i.r   iLLJE5Pr                  LivSv7v7  r i.......gSi..........iY         
+echo;                   Bi.:.ii:7.  :......               .  .... .   v.i:......:gSi: ....... 7r         
+echo;                   DK.:..rL7i ...                     . . ..... i::r...... rQXi. ....... 7:         
+echo;                   PM..:..uuir:.....                   ....... .i7u. ....: 5PDr. :...... Y.         
+echo;                   Ig:..: is .:.. . .                   ......:ijX: ....:..PrZL. .:..... J.         
+echo;                   XYv ... Yi                                . .5r .....: vS.II: .:..... U.         
+echo;                   d:7......LPr             i::.i:            .2v .:..... Xv.iRi..i..... 1.         
+echo;                  .d.r .... :QggKY:.         .            .:YdB2 .:....: IvL. QL. i..... U.         
+echo;                  L7iv ..:. .dq5PdgDMgPJr:... . . :.:ivs1u2v5Mb  ::...: vP:s. K5: i:.... s.         
+echo;                  Z.i7 ..i:  XK52I2bPU7jruLjsJJ127i1X1Lv7riiLX. ::...i.rDiiY. rQ: ii.... L.         
+echo;                 .D :r ..:v  sd22Iduiir777riiirirvvviiiiriisD. ::. .i.rD7:77. .Qs ir.....ri         
+echo;                 U7 :v ...Ii rES2dYir7rv1777ii::r12r::ii:rLbi .:. .i:ug7:i7i . Mg .v.....iJ         
+echo;                .Z: rv ...sI..PXZ1:..   .ruQgP5ji:irXbQPrvKv .:..:rsEDY:ii7:.. UB:.s....:.S         
+echo;                JU. vL ...iXr rBU.   .    1BUPRQq1PQDEDgivI....isS1LEbr:irr: . vuv.5......s.        
+echo;                D:  I7....iiMi I  .   .   :Bus5BBBg2JvPi.J:..i55v:.:Jg7:iir:.. vr7:I: ....iJ        
+echo;               uL. .Ir.. .i:dgYir  .:::. .QBdgDQrsBMdPBZ7v.:1Z7    .:Z7:iiri . JiivX: ...:.5        
+echo;              .E:. :2r....i7DZr.jIXr:.:::rPDQEEd.:QDQMRS7iirLrYi.   .K2:riii.. J7 SXi ...:.iL       
+echo;              u7:..rY7.: ::2ZP   .ii::. ... :72r  vqii:        iUv.  KS:riir.. 2r Kdi ...:: 1.      
+echo;             .d:r :rvL.:.:iXdU      ..... :.        ..  . ..... .i:. 1K:r:ir. .27 qgi ...::..E      
+echo;             2rii :7ij.:.:idPd.. ......... r.  ... .v  .........     51:r:ir.  Xi vBi ...::r is     
+echo;             d.rv ir:sr.:.igBQv:  .......  ri .... iL ......... :   .Mviu:ir: .S: :Bi ..:::vr Y.    
+echo;            7L.D5 rr:i1:..rg:QX5.        .rE...... .S:         ::   KMivR::ri .P. .B: ..::.Jj:.2    
+echo;            Z.s7J iri:7P: r: B5Edi::..::i7s  ...:.. r:::::::::7ri.rPZKi1J7iii :E  :B. ..i:.7Ri.7i   
+echo;           .5rv X.:7ii:uMuvJ gS5DuY2L7rrrr. .. .i. . :vrYuvYXPYsvgMXIXig Lrii.rP  iB. .:::.7:I:.I   
+echo;           iL1  b::iiii:uB:i7bEqu:rr:...    ....7: .. ...    :vrivg15j15 .5:i:ur  PE  .::..2 :I 1   
+echo;           uYU  su.irii:sR   JQPir7r   ....... :r7 ... . . .  i7i:Sq5uQ.  5ii:E.  B7 .:::::d  Z.L.  
+echo;           5b5   Dri777rBP    QR7Y2:...........:Y5:.......... :JJ75BMB1   PJr1P  1B..irii:Zi  B:K   
+echo;           :ii   .i.....r:     i.::. ..... ... ..i.. ........  :...i:i    ::.r   s: .....:i   r.:   
 rmdir /S /Q plugins 
 echo.删除完成，按任意键退出主菜单。
 ECHO.&ECHO. ※ Press any key to return. ※ &PAUSE >NUL 2>NUL& goto menu
@@ -951,6 +1427,7 @@ echo.Are you sure to delete update-module?
 pause
 rmdir /S /Q bt-trackers-update
 rmdir /S /Q mingw
+del /f /q update-module.7z.exe
 echo;                                                                                                    
 echo;                                                                                                    
 echo;                                      .:rr7XXS222SSXXXX;:                                           
@@ -1013,15 +1490,34 @@ ECHO.&ECHO. ※移除完成，按任意键返回！※ &PAUSE >NUL 2>NUL&goto menu
 
 :update-tracker
 cd /d %~dp0
-if exist ".\data\Program\mingw\bin\git.exe" (goto trackerlist) else (goto un7z)
+if exist ".\data\Program\mingw\bin\git.exe" (goto trackerlist) else (goto check-update-tracker-module)
+:check-update-tracker-module
+cd /d %~dp0
+if exist ".\data\Program\update-module.7z.exe" (goto un7z) else (goto download-update-tracker-module)
+:download-update-tracker-module
+cd /d %~dp0
+cd .\data\Program\
+echo.未检测到更新模块，按任意键开始下载，否则请直接关闭窗口。
+pause
+.\bin\curl.exe -L -o update-module.7z.exe "https://m.tmoe.me/down/share/windows/aria2/modules/update-module.7z.exe"
+echo.Download completed and is activating for you.
+timeout /t 1
+.\update-module.7z.exe -y  
+timeout /t 1 >nul 2>nul
+echo.正在清除已下载的缓存数据。
+del .\update-module.7z.exe
+goto trackerlist
+
 :un7z
 echo.检测到更新模块未启用，正在为您启用。
+cd /d %~dp0
 .\data\Program\update-module.7z.exe -y
 timeout /t 3
 ::move /y .\data\Program\.git ..\..
 goto trackerlist
 
 :trackerlist
+cd /d %~dp0
 start .\data\Program\bt-trackers-update\bt-trackers-update.bat
 echo;                    :BQBQMji          jB.                                                           
 echo;                    vBPqDQBBBQQXj:   .BJj   .:rL1U5SKXKUY7i.                                        

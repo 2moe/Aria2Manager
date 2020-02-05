@@ -1,0 +1,13 @@
+[service]
+    [service.database]
+    saved-path = "waifud.sqlite"
+    min-ttl = 600
+
+    [service.jsonapi]
+
+    [service.telebot]
+    token = "877689689:AAEbLl8SQsrjynWsWOBLYXz8EdgJ71OMvrU"
+
+
+    [service.aria2c]
+    url = "http://127.0.0.1:6800/jsonrpc"

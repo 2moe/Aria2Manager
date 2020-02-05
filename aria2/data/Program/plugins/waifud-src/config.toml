@@ -1,0 +1,14 @@
+[service]
+    [service.database]
+    saved-path = "waifud.gob"
+    min-ttl = 600
+
+    [service.jsonapi]
+
+    [service.telebot]
+    token = "123456789:AABBCCDDEEFFGGHH"
+
+
+    [service.aria2c]
+    url = "http://127.0.0.1:6800/jsonrpc"
+    secret = "123456"

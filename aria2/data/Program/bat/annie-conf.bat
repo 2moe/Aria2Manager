@@ -63,7 +63,7 @@ echo.
 ::start .\aria2.conf
 ::move /y ".\annie-secret-token.tmp.txt"  ".\data\Program\bin\rpc-secret.txt"  >nul 2>nul
 cd .\data\Program\bin
-.\sed.exe -i "s:^rpc-secret=::" .\rpc-secret.txt
+.\sed.exe -i "s:rpc-secret=::" .\rpc-secret.txt
 move /y ".\rpc-secret.txt" ..\bat\"annie-secret-token.tmp.txt"  >nul 2>nul
 cd ..\bat
 copy /y annie.ps1 annie.bat >nul 2>nul

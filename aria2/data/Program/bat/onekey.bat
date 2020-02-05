@@ -1,4 +1,5 @@
 @echo off
+title Aria2-installer
 echo.正在终止aria2c进程
 Taskkill /F /IM aria2c.exe
 echo.正在初始化。。。
@@ -23,6 +24,7 @@ start "" "http://aria2.net"
 start "" ".\index.html"
 cd ..\..\..\
 .\aria2c.exe --conf-path=aria2.conf 
+title Aria2 is now successfully installed！
 TaskList /FI "IMAGENAME eq aria2c.exe" /FO LIST
 echo.最近版本的更新日志： 
 type .\data\Program\log\update.log 
